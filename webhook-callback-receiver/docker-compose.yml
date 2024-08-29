@@ -1,0 +1,9 @@
+version: '3'
+services:
+  webhook-callback-receiver:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_APPLICATION_NAME: webhook-callback-receiver
+
