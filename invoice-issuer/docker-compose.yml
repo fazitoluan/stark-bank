@@ -1,0 +1,32 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: luan
+      POSTGRES_PASSWORD: starkbank_luan
+      POSTGRES_DB: starkbankdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  invoice-issuer:
+    build: .
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_APPLICATION_NAME: invoice-issuer
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/starkbankdb
+      SPRING_DATASOURCE_USERNAME: luan
+      SPRING_DATASOURCE_PASSWORD: starkbank_luan
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      LIMIT_ISSUED_PER_ITER: 10
+      SERVER_PORT: 8081
+
+volumes:
+  postgres-data:
