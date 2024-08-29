@@ -33,7 +33,7 @@ public class TransferService {
             data.put(TransferBodyParamEnum.ACCOUNT_TYPE.getValue(), "payment");
 
             Transfer.create(Collections.singletonList(new Transfer(data)));
-            log.info("Transfer to Stark Bank SUCCEEDED");
+            log.info("Transfer to Stark Bank succeeded");
         } catch (Exception e) {
             log.error("Error while sending transfer the amount {} from invoiceId {} to Stark Bank",
                     amountAfterTaxes, invoiceId, e);

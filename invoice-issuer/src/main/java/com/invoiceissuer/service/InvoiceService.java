@@ -32,7 +32,7 @@ public class InvoiceService {
     private String privateKeyPath;
 
     @Value("${environment.app}")
-    private String enviroment;
+    private String environment;
 
     @Value("${project.id}")
     private String projectId;
@@ -43,12 +43,12 @@ public class InvoiceService {
     }
 
     public void generateAuth() throws Exception {
-        log.info("Invoice generation started for enviroment {} and project {}", enviroment, projectId);
+        log.info("Invoice generation started for environment {} and project {}", environment, projectId);
         try {
             String privateKeyContent = new String(Files.readAllBytes(Paths.get(privateKeyPath)));
 
             Settings.user = new Project(
-                    enviroment,
+                    environment,
                     projectId,
                     privateKeyContent
             );
@@ -64,7 +64,7 @@ public class InvoiceService {
 
             int count = 0;
             Integer issuingInvoiceReturn;
-            log.info("Limit issued per iter: {}", limitIssuedPerIter);
+            log.info("Limit of invoice issues per iteration: {}", limitIssuedPerIter);
             while (count < limitIssuedPerIter) {
                 issuingInvoiceReturn = issuingInvoice();
 
@@ -176,6 +176,6 @@ public class InvoiceService {
             invoiceDao.save(invoice);
             return;
         }
-        throw new Exception("Cannot save invoice without mandatory fields (amount, name and taxId");
+        throw new Exception("Cannot save invoice without mandatory fields (amount, name and taxId)");
     }
 }

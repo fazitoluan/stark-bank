@@ -22,7 +22,7 @@ public class EventController {
     }
 
     @PostMapping(path = "fromStarkBank")
-    public String fromStarkBank(@RequestBody String body) throws Exception {
+    public void fromStarkBank(@RequestBody String body) throws Exception {
 
         log.info("Capturing event from Stark Bank");
         try {
@@ -30,7 +30,6 @@ public class EventController {
         } catch (Exception e) {
             log.error("Error while capturing event from Stark Bank", e);
         }
-        return body;
     }
 
     @Scheduled(cron = "${cron.expression.to.sync}")

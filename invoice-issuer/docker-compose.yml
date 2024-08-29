@@ -30,7 +30,7 @@ services:
       ENVIRONMENT_APP: sandbox
       PROJECT_ID: 5357212679536640
       LIMIT_ISSUES_PER_ITERATION: 10
-      CRON_EXPRESSION_INVOICE_ISSUE: 0 0 0/1 * * *
+      CRON_EXPRESSION_INVOICE_ISSUE: 0 0 0/3 * * *
 
 volumes:
   postgres-data:

@@ -26,13 +26,13 @@ import java.util.*;
 public class EventService {
 
     @Value("${private.key.path}")
-    private String privateKeyPath;
+    protected String privateKeyPath;
 
     @Value("${environment.app}")
-    private String enviroment;
+    protected String environment;
 
     @Value("${project.id}")
-    private String projectId;
+    protected String projectId;
 
     private final TransferService transferService;
 
@@ -46,7 +46,7 @@ public class EventService {
             String privateKeyContent = new String(Files.readAllBytes(Paths.get(privateKeyPath)));
 
             Settings.user = new Project(
-                    enviroment,
+                    environment,
                     projectId,
                     privateKeyContent
             );
@@ -55,10 +55,9 @@ public class EventService {
         }
     }
 
-    public void transferFromInvoiceEvent(String body) throws Exception {
+    public void transferFromInvoiceEvent(String body) {
 
         try {
-            log.info("Initializing transfer from invoice event");
             JsonObject jsonObject = JsonParser.parseString(body).getAsJsonObject();
             if (jsonObject.isEmpty()) {
                 throw new Exception("The request body is empty");
@@ -73,6 +72,7 @@ public class EventService {
             if (logObject != null) {
                 String logType = Objects.requireNonNull(getElement("type", logObject)).getAsString();
                 if (LogStatusEnum.PAID.getValue().equals(logType)) {
+                    log.info("Log Type PAID. Initializing transfer from invoice event");
 
                     JsonObject invoiceObject = getJsonObjectByField("invoice", logObject);
                     if (invoiceObject != null) {
@@ -91,6 +91,7 @@ public class EventService {
                     }
                     throw new Exception("The request body does not contain expected object called invoice");
                 }
+                log.info("Log Type is not PAID. Aborting transfer from invoice event");
             } else {
                 throw new Exception("The request body does not contain expected object called log");
             }
