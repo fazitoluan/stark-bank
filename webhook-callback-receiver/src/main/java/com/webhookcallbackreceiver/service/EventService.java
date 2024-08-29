@@ -4,21 +4,35 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.starkbank.Event;
 import com.starkbank.Project;
 import com.starkbank.Settings;
+import com.starkbank.utils.Generator;
+import com.webhookcallbackreceiver.enumeration.EventBodyParamEnum;
 import com.webhookcallbackreceiver.enumeration.LogStatusEnum;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Log4j2
 @Service
 public class EventService {
+
+    @Value("${private.key.path}")
+    private String privateKeyPath;
+
+    @Value("${environment.app}")
+    private String enviroment;
+
+    @Value("${project.id}")
+    private String projectId;
 
     private final TransferService transferService;
 
@@ -27,16 +41,13 @@ public class EventService {
         this.transferService = transferService;
     }
 
-    public static void generateAuth() throws Exception {
-
+    public void generateAuth() throws Exception {
         try {
-            String filePath = "/var/opt/resources/privateKey.pem";
-
-            String privateKeyContent = new String(Files.readAllBytes(Paths.get(filePath)));
+            String privateKeyContent = new String(Files.readAllBytes(Paths.get(privateKeyPath)));
 
             Settings.user = new Project(
-                    "sandbox",
-                    "5357212679536640",
+                    enviroment,
+                    projectId,
                     privateKeyContent
             );
         } catch (IOException e) {
@@ -47,6 +58,7 @@ public class EventService {
     public void transferFromInvoiceEvent(String body) throws Exception {
 
         try {
+            log.info("Initializing transfer from invoice event");
             JsonObject jsonObject = JsonParser.parseString(body).getAsJsonObject();
             if (jsonObject.isEmpty()) {
                 throw new Exception("The request body is empty");
@@ -66,9 +78,15 @@ public class EventService {
                     if (invoiceObject != null) {
                         Long invoiceId = Objects.requireNonNull(getElement("id", invoiceObject)).getAsLong();
                         Long amountAfterFees = Objects.requireNonNull(getElement("nominalAmount", invoiceObject)).getAsLong();
+                        if (invoiceObject.has("discountAmount")) {
+                            amountAfterFees -= Objects.requireNonNull(getElement("discountAmount", invoiceObject)).getAsLong();
+                        }
 
                         generateAuth();
+
+                        log.info("Transfer origin from invoiceId {}. Total amount that will be sent: {}", invoiceId, amountAfterFees);
                         transferService.transferToStarkBank(invoiceId, amountAfterFees);
+
                         return;
                     }
                     throw new Exception("The request body does not contain expected object called invoice");
@@ -103,5 +121,40 @@ public class EventService {
             return jsonObject.get(fieldName);
         }
         return null;
+    }
+
+    private Generator<Event> getUndeliveredEvent() throws Exception {
+        log.info("Searching for undelivered events");
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put(EventBodyParamEnum.IS_DELIVERED.getValue(), false);
+        params.put(EventBodyParamEnum.BEFORE.getValue(), new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+        return Event.query(params);
+    }
+
+    public void updateEventToDelivered() throws Exception {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put(EventBodyParamEnum.IS_DELIVERED.getValue(), true);
+
+        try {
+            generateAuth();
+            Generator<Event> undeliveredEventGenerator = getUndeliveredEvent();
+
+            List<Event> undeliveredEventList = new ArrayList<>();
+            undeliveredEventGenerator.forEach(undeliveredEventList::add);
+            if (undeliveredEventList.isEmpty()) {
+                log.info("Could not find any undelivered events");
+                return;
+            }
+
+            for (Event undeliveredEvent : undeliveredEventList) {
+                Event.update(undeliveredEvent.id, params);
+                log.info("Event id {} set as delivered", undeliveredEvent.id);
+            }
+        } catch (Exception e) {
+            log.error("Error while executing method updateEventToDelivered: {}", e.getMessage());
+            throw e;
+        }
+
     }
 }

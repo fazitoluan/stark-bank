@@ -6,4 +6,7 @@ services:
       - "8080:8080"
     environment:
       SPRING_APPLICATION_NAME: webhook-callback-receiver
-
+      PRIVATE_KEY_PATH: /var/opt/resources/privateKey.pem
+      ENVIRONMENT_APP: sandbox
+      PROJECT_ID: 5357212679536640
+      CRON_EXPRESSION_TO_SYNC: 0 0 3 * * ?

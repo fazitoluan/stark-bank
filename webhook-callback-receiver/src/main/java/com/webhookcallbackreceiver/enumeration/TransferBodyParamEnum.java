@@ -14,7 +14,7 @@ public enum TransferBodyParamEnum {
     DISPLAY_DESCRIPTION("displayDescription"),
     TAGS("tags"),
     RULES("rules"),
-    RESENDING_LIMIT("resendingLimit"),;
+    RESENDING_LIMIT("resendingLimit");
 
     private final String value;
 

@@ -19,14 +19,18 @@ services:
       - postgres
     environment:
       SPRING_APPLICATION_NAME: invoice-issuer
+      SERVER_PORT: 8081
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/starkbankdb
       SPRING_DATASOURCE_USERNAME: luan
       SPRING_DATASOURCE_PASSWORD: starkbank_luan
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "false"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
-      LIMIT_ISSUED_PER_ITER: 10
-      SERVER_PORT: 8081
+      PRIVATE_KEY_PATH: /var/opt/resources/privateKey.pem
+      ENVIRONMENT_APP: sandbox
+      PROJECT_ID: 5357212679536640
+      LIMIT_ISSUES_PER_ITERATION: 10
+      CRON_EXPRESSION_INVOICE_ISSUE: 0 0 0/1 * * *
 
 volumes:
   postgres-data:

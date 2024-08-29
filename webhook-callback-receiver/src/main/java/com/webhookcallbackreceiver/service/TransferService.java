@@ -17,7 +17,6 @@ public class TransferService {
     public void transferToStarkBank(Long invoiceId, Long amountAfterTaxes) {
 
         try {
-            List<Transfer> transfers = new ArrayList<>();
             HashMap<String, Object> data = new HashMap<>();
             data.put(TransferBodyParamEnum.AMOUNT.getValue(), amountAfterTaxes);
             data.put(TransferBodyParamEnum.BANK_CODE.getValue(), "20018183");
@@ -25,7 +24,7 @@ public class TransferService {
             data.put(TransferBodyParamEnum.ACCOUNT_NUMBER.getValue(), "6341320293482496");
             data.put(TransferBodyParamEnum.TAX_ID.getValue(), "20.018.183/0001-80");
             data.put(TransferBodyParamEnum.NAME.getValue(), "Stark Bank S.A.");
-            //data.put("externalId", "my-external-id");
+            data.put(TransferBodyParamEnum.EXTERNAL_ID.getValue(), "invoiceId" + invoiceId);
             data.put(TransferBodyParamEnum.TAGS.getValue(), new String[]{"case test"});
 
             List<Transfer.Rule> rules = new ArrayList<>();
@@ -34,11 +33,7 @@ public class TransferService {
             data.put(TransferBodyParamEnum.ACCOUNT_TYPE.getValue(), "payment");
 
             Transfer.create(Collections.singletonList(new Transfer(data)));
-
-            transfers.add(new Transfer(data));
-            for (Transfer transfer : transfers){
-                System.out.println(transfer);
-            }
+            log.info("Transfer to Stark Bank SUCCEEDED");
         } catch (Exception e) {
             log.error("Error while sending transfer the amount {} from invoiceId {} to Stark Bank",
                     amountAfterTaxes, invoiceId, e);
