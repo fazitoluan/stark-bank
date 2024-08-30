@@ -9,6 +9,6 @@ services:
       PRIVATE_KEY_PATH: /var/opt/resources/privateKey.pem
       ENVIRONMENT_APP: sandbox
       PROJECT_ID: 6241470075895808
-      CRON_EXPRESSION_TO_SYNC: 0 0 3 * * ?
+      CRON_EXPRESSION_TO_SYNC: 0 30 3 * * ?
     volumes:
       - /var/opt/resources:/var/opt/resources
