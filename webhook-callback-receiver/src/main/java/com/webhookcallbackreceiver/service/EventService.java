@@ -78,8 +78,12 @@ public class EventService {
                     if (invoiceObject != null) {
                         Long invoiceId = Objects.requireNonNull(getElement("id", invoiceObject)).getAsLong();
                         Long amountAfterFees = Objects.requireNonNull(getElement("nominalAmount", invoiceObject)).getAsLong();
+                        amountAfterFees -= 50;
                         if (invoiceObject.has("discountAmount")) {
                             amountAfterFees -= Objects.requireNonNull(getElement("discountAmount", invoiceObject)).getAsLong();
+                        }
+                        if (amountAfterFees < 0) {
+                            throw new Exception("Negative amount after fee. Transfer will not be sent");
                         }
 
                         generateAuth();
