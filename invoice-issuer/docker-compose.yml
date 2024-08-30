@@ -28,9 +28,11 @@ services:
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       PRIVATE_KEY_PATH: /var/opt/resources/privateKey.pem
       ENVIRONMENT_APP: sandbox
-      PROJECT_ID: 5599669673525248
+      PROJECT_ID: 6241470075895808
       LIMIT_ISSUES_PER_ITERATION: 10
       CRON_EXPRESSION_INVOICE_ISSUE: 0 0 0/3 * * *
+    volumes:
+      - /var/opt/resources:/var/opt/resources
 
 volumes:
   postgres-data:
