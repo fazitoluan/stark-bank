@@ -8,5 +8,5 @@ services:
       SPRING_APPLICATION_NAME: webhook-callback-receiver
       PRIVATE_KEY_PATH: /var/opt/resources/privateKey.pem
       ENVIRONMENT_APP: sandbox
-      PROJECT_ID: 5357212679536640
+      PROJECT_ID: 5599669673525248
       CRON_EXPRESSION_TO_SYNC: 0 0 3 * * ?
