@@ -25,7 +25,7 @@ public class InvoiceController {
     }
 
     @Scheduled(cron = "${cron.expression.invoice.issue}")
-    public void issueInvoice() {
+    public void issueInvoiceListener() {
         log.info("Starting invoice issue");
         try {
             invoiceService.issueInvoice();

@@ -14,16 +14,20 @@ import java.util.List;
 @Service
 public class TransferService {
 
-    public void transferToStarkBank(Long invoiceId, Long amountAfterTaxes) {
+    public void transferToStarkBank(String invoiceId, Long amountAfterTaxes) {
+
+        String accountNumber = "6341320293482496";
+        String accountName = "Stark Bank S.A.";
 
         try {
+
             HashMap<String, Object> data = new HashMap<>();
             data.put(TransferBodyParamEnum.AMOUNT.getValue(), amountAfterTaxes);
             data.put(TransferBodyParamEnum.BANK_CODE.getValue(), "20018183");
             data.put(TransferBodyParamEnum.BRANCH_CODE.getValue(), "0001");
-            data.put(TransferBodyParamEnum.ACCOUNT_NUMBER.getValue(), "6341320293482496");
+            data.put(TransferBodyParamEnum.ACCOUNT_NUMBER.getValue(), accountNumber);
             data.put(TransferBodyParamEnum.TAX_ID.getValue(), "20.018.183/0001-80");
-            data.put(TransferBodyParamEnum.NAME.getValue(), "Stark Bank S.A.");
+            data.put(TransferBodyParamEnum.NAME.getValue(), accountName);
             data.put(TransferBodyParamEnum.EXTERNAL_ID.getValue(), "invoiceId" + invoiceId);
             data.put(TransferBodyParamEnum.TAGS.getValue(), new String[]{"case test"});
 
@@ -33,7 +37,7 @@ public class TransferService {
             data.put(TransferBodyParamEnum.ACCOUNT_TYPE.getValue(), "payment");
 
             Transfer.create(Collections.singletonList(new Transfer(data)));
-            log.info("Transfer to Stark Bank succeeded");
+            log.info("Transfer to {}, account {} created successfully", accountName, accountNumber);
         } catch (Exception e) {
             log.error("Error while sending transfer the amount {} from invoiceId {} to Stark Bank",
                     amountAfterTaxes, invoiceId, e);

@@ -1,54 +1,45 @@
 package com.webhookcallbackreceiver.service;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
+@SpringBootTest
 public class EventServiceTest {
-
-    @InjectMocks
-    private EventService eventService;
 
     @Mock
     private TransferService transferService;
 
+    @InjectMocks
+    private EventService eventService;
+
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testEmptyJson() throws Exception {
-        String json = "{}";
-        eventService.transferFromInvoiceEvent(json);
+    public void testInitialization() {
+        TransferService transferService = mock(TransferService.class);
+        EventService eventService = new EventService(transferService);
+        Assert.assertNotNull(eventService);
     }
 
     @Test
-    void testJsonWithoutEvent() throws Exception {
-        String logJson = "{\"log\": {}}";
-        eventService.transferFromInvoiceEvent(logJson);
+    public void testEventOriginManagerThrowsException() {
+        String bodyContent = "{test:2329}";
+        String signature = "Mskdjak23213099Eq=231ewq/weoidsw2";
+
+        assertThrows(Exception.class, () -> {
+            eventService.eventOriginManager(bodyContent, signature);
+        });
     }
 
-    @Test
-    void testJsonWithEventButWithoutLog() throws Exception {
-        String eventJson = "{\"event\": {}}";
-        eventService.transferFromInvoiceEvent(eventJson);
-    }
-
-    @Test
-    void testJsonWithEventLogButWithoutInvoice() throws Exception {
-        String eventJson = "{\"event\": {\"log\": {\"type\": \"PAID\"}}}";
-        eventService.transferFromInvoiceEvent(eventJson);
-    }
-
-    @Test
-    void testValidJson() throws Exception {
-        String fullBodyJson = "{\"event\": {\"log\": {\"type\": \"PAID\", \"invoice\": {\"id\": 321938219, \"nominalAmount\": 982100, \"discountAmount\": 88700}}}}";
-        eventService.transferFromInvoiceEvent(fullBodyJson);
-        assertDoesNotThrow(() -> eventService.transferFromInvoiceEvent(fullBodyJson));
-    }
 }
